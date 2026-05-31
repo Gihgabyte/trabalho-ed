@@ -101,56 +101,51 @@ void inserirOrdenado(NoB *p, char *chave)
 void splitFilho(NoB *pai, int indice)
 {
     NoB *y = pai->filhos[indice];
-
     NoB *z = criarNo(y->folha);
 
-    z->n = d;
+    int meio = d;
 
-    for(int j=0;j<d;j++)
+    z->n = d - 1;
+
+    for(int j = 0; j < d - 1; j++)
     {
-        z->chaves[j] = y->chaves[j+d+1];
-
-        y->chaves[j+d+1] = NULL;
+        z->chaves[j] = y->chaves[j + meio + 1];
+        y->chaves[j + meio + 1] = NULL;
     }
 
     if(!y->folha)
     {
-        for(int j=0;j<d+1;j++)
+        for(int j = 0; j < d; j++)
         {
-            z->filhos[j] =
-                y->filhos[j+d+1];
-
-            y->filhos[j+d+1] = NULL;
+            z->filhos[j] = y->filhos[j + meio + 1];
+            y->filhos[j + meio + 1] = NULL;
         }
     }
 
+    char *chavePromovida = y->chaves[meio];
+    y->chaves[meio] = NULL;
+
     y->n = d;
 
-    for(int j=pai->n; j>=indice+1; j--)
+    for(int j = pai->n; j >= indice + 1; j--)
     {
-        pai->filhos[j+1] =
-            pai->filhos[j];
+        pai->filhos[j + 1] = pai->filhos[j];
     }
 
-    pai->filhos[indice+1] = z;
+    pai->filhos[indice + 1] = z;
 
-    for(int j=pai->n-1; j>=indice; j--)
+    for(int j = pai->n - 1; j >= indice; j--)
     {
-        pai->chaves[j+1] =
-            pai->chaves[j];
+        pai->chaves[j + 1] = pai->chaves[j];
     }
 
-    pai->chaves[indice] =
-        y->chaves[d];
-
-    y->chaves[d] = NULL;
+    pai->chaves[indice] = chavePromovida;
 
     pai->n++;
 }
 
 
 //inserção recursiva
-
 void inserirNaoCheio(NoB *p, char *chave)
 {
     int i = p->n - 1;
@@ -247,6 +242,8 @@ void carregarArquivo()
     while(fgets(nome,100,arq))
     {
         nome[strcspn(nome,"\n")] = '\0';
+
+        printf("Inserindo: %s\n", nome);
 
         inserir(nome);
     }
