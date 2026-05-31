@@ -1,9 +1,12 @@
+// Giovanna Carla Andrade da Silva - 202419060188
+// Laura Santa Cruz -
+// Ivan Francisco - 
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_STR 1007
+#define MAX_STR 100
 
 typedef struct NoB {
     int n;                 // quantidade atual de chaves
@@ -14,6 +17,14 @@ typedef struct NoB {
     struct NoB **filhos;   // vetor de ponteiros para filhos
 } NoB;
 
+char *copiarString(const char *s)
+{
+    char *nova = malloc(strlen(s)+1);
+
+    strcpy(nova,s);
+
+    return nova;
+}
 
 //variaveis globais
 int d;
@@ -27,6 +38,10 @@ NoB *criarNo(int folha)
     novo->n = 0;
 
     novo->chaves = malloc((2*d + 1) * sizeof(char*));
+
+    for(int i=0;i<2*d+1;i++){
+        novo->chaves[i] = NULL;
+    }
 
     novo->filhos = malloc((2*d + 2) * sizeof(NoB*));
 
@@ -74,7 +89,7 @@ void inserirOrdenado(NoB *p, char *chave)
         i--;
     }
 
-    p->chaves[i+1] = strdup(chave);
+    p->chaves[i+1] = copiarString(chave);
 
     p->n++;
 }
@@ -82,6 +97,7 @@ void inserirOrdenado(NoB *p, char *chave)
 
 
 // split
+
 void splitFilho(NoB *pai, int indice)
 {
     NoB *y = pai->filhos[indice];
@@ -91,25 +107,43 @@ void splitFilho(NoB *pai, int indice)
     z->n = d;
 
     for(int j=0;j<d;j++)
+    {
         z->chaves[j] = y->chaves[j+d+1];
+
+        y->chaves[j+d+1] = NULL;
+    }
 
     if(!y->folha)
     {
         for(int j=0;j<d+1;j++)
-            z->filhos[j] = y->filhos[j+d+1];
+        {
+            z->filhos[j] =
+                y->filhos[j+d+1];
+
+            y->filhos[j+d+1] = NULL;
+        }
     }
 
     y->n = d;
 
     for(int j=pai->n; j>=indice+1; j--)
-        pai->filhos[j+1] = pai->filhos[j];
+    {
+        pai->filhos[j+1] =
+            pai->filhos[j];
+    }
 
     pai->filhos[indice+1] = z;
 
     for(int j=pai->n-1; j>=indice; j--)
-        pai->chaves[j+1] = pai->chaves[j];
+    {
+        pai->chaves[j+1] =
+            pai->chaves[j];
+    }
 
-    pai->chaves[indice] = y->chaves[d];
+    pai->chaves[indice] =
+        y->chaves[d];
+
+    y->chaves[d] = NULL;
 
     pai->n++;
 }
@@ -130,7 +164,7 @@ void inserirNaoCheio(NoB *p, char *chave)
             i--;
         }
 
-        p->chaves[i+1] = strdup(chave);
+        p->chaves[i+1] = copiarString(chave);
         p->n++;
     }
     else
@@ -161,7 +195,7 @@ void inserir(char *chave)
     {
         raiz = criarNo(1);
 
-        raiz->chaves[0] = strdup(chave);
+        raiz->chaves[0] = copiarString(chave);
 
         raiz->n = 1;
 
@@ -194,13 +228,19 @@ void inserir(char *chave)
 // carregamento do arquivo
 void carregarArquivo()
 {
+    //mudar caminho do arquivo (pokemon_names.txt)
     FILE *arq = fopen("pokemon_names.txt","r");
 
-    if(arq == NULL)
+    if(arq == NULL) 
     {
-        printf("Arquivo nao encontrado.\n");
+        printf(
+            "Erro ao abrir pokemon_names.txt.\n"
+            "Verifique se o arquivo esta no mesmo diretorio do executavel.\n"
+        );
         return;
     }
+    printf("Arquivo carregado com sucesso!\n");
+
 
     char nome[100];
 
@@ -218,17 +258,17 @@ void carregarArquivo()
 //  menu/main
 int main()
 {
-    printf("Digite a ordem d: ");
-    scanf("%d",&d);
+    do{
+        printf("Digite a ordem d: ");
+        scanf("%d",&d);
 
-    if(d < 2)
-    {
-        printf("d deve ser >= 2\n");
-        return 1;
-    }
+        if(d < 2)
+            printf("Valor invalido!\n");
+
+    } while(d < 2);
 
     carregarArquivo();
-
+    
     int opcao;
 
     do
