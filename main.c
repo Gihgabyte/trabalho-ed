@@ -238,6 +238,7 @@ void carregarArquivo()
 
 
     char nome[100];
+    int contador = 0;
 
     while(fgets(nome,100,arq))
     {
@@ -246,7 +247,10 @@ void carregarArquivo()
         printf("Inserindo: %s\n", nome);
 
         inserir(nome);
+
+        contador++;
     }
+    printf("\nLidos do arquivo: %d\n", contador);
 
     fclose(arq);
 }
